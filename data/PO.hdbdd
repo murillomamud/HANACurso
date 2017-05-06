@@ -1,0 +1,94 @@
+namespace PurchaseOrder.data;
+
+@Schema: 'SYSTEM'
+context PO {
+
+	//Criação de Tipos, como se fossem os Elementos de Dados, Estruturas
+	type BusinessKey : String(10);
+	type MediumText  : String(10);
+	type SDate       : LocalDate;
+	type CurrencyT   : String(5);
+	type AmountT     : Decimal(15, 2);
+	type QuantityT   : Decimal(13, 3);
+	type UnitT       : String(3);
+	type StatusT     : String(1);
+	type HistoryT {
+		CREATEDBY : BusinessKey;
+		CREATEDAT : SDate;
+		CHANGEDBY : BusinessKey;
+		CHANGEDAT : SDate;
+	}
+	
+	
+	/**
+	* HEADER
+	*/
+	//ENTITIES SÃO AS TABELAS
+	@Catalog.tableType: #COLUMN
+	entity Header{
+		key PURCHASEORDERID    : BusinessKey;
+			ITEMS              : association[*] to Item on ITEMS.PURCHASEORDERID = PURCHASEORDERID;
+		    HISTORY            : HistoryT;
+			NOTEID             : BusinessKey null;
+			PARTNER            : BusinessKey null;
+			CURRENCY           : CurrencyT;
+			GROSSAMOUNT        : AmountT;
+			NETAMOUNT          : AmountT;
+			TAXAMOUNT          : AmountT;
+			LIFECYCLESTATUS    : StatusT;
+			APPROVALSTATUS     : StatusT;
+			CONFIRMSTATUS      : StatusT;
+			ORDERINGSTATUS     : StatusT;
+			INVOINCINGSTATUS   : StatusT;
+	}
+	
+	/**
+	* ITEM
+	*/
+	@Catalog.tableType: #COLUMN
+	entity Item{
+		key PURCHASEORDERID   : BusinessKey;
+		key PURCHASEORDERITEM : BusinessKey;
+		HEADER                : association[1] to Header on HEADER.PURCHASEORDERID = PURCHASEORDERID;
+		PRODUCT               : association to Product;		
+		NOTEID                : BusinessKey;
+		CURRENCY              : CurrencyT;
+		GROSSAMOUNT           : AmountT;
+		NETAMOUNT             : AmountT;
+		TAXAMOUNT             : AmountT;
+		QUANTITY              : QuantityT;
+		QUANTITYUNIT          : UnitT;
+		DELIVERYDATE          : SDate;
+	}
+	
+	/**
+	* PRODUTOS
+	*/
+	@Catalog.tableType: #COLUMN
+	entity Product{
+		key PRODUCTID   : BusinessKey;
+			DESCRIPTION : MediumText;
+			UNITMEASURE : UnitT;
+			RELEASEDATE : SDate;
+	}
+	
+	
+	
+	/**
+	* DEFINIÇÃO DE UMA VIEW DA TABELA DE ITENS COM A TABELA DE HEADER
+	*/
+	define view ItemView as select from Item{
+		
+		PURCHASEORDERID   as "PurchaseOrderItem",
+		PURCHASEORDERITEM as "Item",
+		HEADER.PARTNER    as "PartnerId",
+		CURRENCY          as "CurrencyCode",
+		GROSSAMOUNT       as "GrossAmount",
+		NETAMOUNT         as "NetAmount",
+		TAXAMOUNT         as "TaxAmount",
+		QUANTITY          as "Quantity",
+		QUANTITYUNIT      as "QuantityUnit",
+		DELIVERYDATE      as "DeliveryDate"		
+	};
+
+};
