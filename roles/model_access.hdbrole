@@ -1,0 +1,21 @@
+role PurchaseOrder.roles::model_access {
+	//schema privileges
+	catalog schema "_SYS_BIC" : SELECT, EXECUTE; //SCHEMA PADRÃO DO HANA TRIAL
+	catalog schema "_SYS_REPO": SELECT, EXECUTE; //SCHEMA PADRÃO DO HANA TRIAL
+	
+	
+	//system privileges
+	system privilege: BACKUP ADMIN, USER ADMIN;
+	
+	//SCHEMA PRIVILEGES
+	
+	sql object PurchaseOrder.data::PO.Header   : SELECT, INSERT, UPDATE, DELETE;
+	sql object PurchaseOrder.data::PO.Item     : SELECT, INSERT, UPDATE, DELETE;
+	sql object PurchaseOrder.data::PO.Partner  : SELECT, INSERT, UPDATE, DELETE;
+	sql object PurchaseOrder.data::PO.Product  : SELECT, INSERT, UPDATE, DELETE;
+	sql object PurchaseOrder.data::PO.User     : SELECT, INSERT, UPDATE, DELETE;
+	sql object PurchaseOrder.data::PO.ItemView : SELECT;
+	
+	application privilege: PurchaseOrder::Execute, PurchaseOrder::Admin;
+	
+}
